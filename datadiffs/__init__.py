@@ -1,3 +1,4 @@
+from .diffs import Diff  # noqa
 from .operations import Operation, OperationType  # noqa
 
 

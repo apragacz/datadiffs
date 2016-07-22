@@ -78,3 +78,6 @@ class ImmutableDictListProtocol(ValueProtocol):
         if index >= len(obj):
             raise InvalidValueState("index {0} does not exist".format(index))
         return obj[0:index] + obj[index + 1:]
+
+
+DEFAULT_PROTOCOL = ImmutableDictListProtocol()

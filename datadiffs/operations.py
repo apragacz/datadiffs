@@ -1,9 +1,7 @@
 from .freezing import freeze_data, unfreeze_data
-from .protocols import ImmutableDictListProtocol
+from .protocols import DEFAULT_PROTOCOL
 
 __REGISTRY__ = {}
-
-DEFAULT_PROTOCOL = ImmutableDictListProtocol()
 
 
 class OperationType(object):
