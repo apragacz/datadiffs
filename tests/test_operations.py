@@ -36,23 +36,23 @@ def test_simple_cases():
 
 def test_eq():
     op1 = Operation.from_serializable_data({
-        'type': OT.INSERTION,
+        'type': OT.INSERTION.value,
         'context': ('pizzas', 1),
         'new_value': {'name': 'capriciosa'},
     })
     op2 = Operation.from_serializable_data({
-        'type': OT.INSERTION,
+        'type': OT.INSERTION.value,
         'context': ('pizzas',),
         'new_value': {'name': 'capriciosa'},
     })
 
     op3 = Operation.from_serializable_data({
-        'type': OT.INSERTION,
+        'type': OT.INSERTION.value,
         'context': ('pizzas', 1),
         'new_value': {'name': 'parma'},
     })
     op4 = Operation.from_serializable_data({
-        'type': OT.DELETION,
+        'type': OT.DELETION.value,
         'context': ('pizzas', 1),
         'old_value': {'name': 'capriciosa'},
     })
@@ -61,6 +61,21 @@ def test_eq():
     assert op2 != op3
     assert op1 != op3
     assert op1 != op4
+
+
+def test_with_pushed_context_prefix():
+    op = Operation.from_serializable_data({
+        'type': OT.INSERTION.value,
+        'context': ('pizzas', 1),
+        'new_value': {'name': 'capriciosa'},
+    })
+    expected_op_prefixed = Operation.from_serializable_data({
+        'type': OT.INSERTION.value,
+        'context': ('order', 'pizzas', 1),
+        'new_value': {'name': 'capriciosa'},
+    })
+    op_prefixed = op.with_pushed_context_prefix('order')
+    assert op_prefixed == expected_op_prefixed
 
 
 SIMPLE_TEST_CASES = [
@@ -72,7 +87,7 @@ SIMPLE_TEST_CASES = [
             ]
         },
         {
-            'type': OT.INSERTION,
+            'type': OT.INSERTION.value,
             'context': ('pizzas', 1),
             'new_value': {'name': 'capriciosa'},
         },
@@ -93,7 +108,7 @@ SIMPLE_TEST_CASES = [
             ]
         },
         {
-            'type': OT.DELETION,
+            'type': OT.DELETION.value,
             'context': ('pizzas', 1),
             'old_value': {'name': 'capriciosa'},
         },
@@ -113,7 +128,7 @@ SIMPLE_TEST_CASES = [
             ]
         },
         {
-            'type': OT.REPLACEMENT,
+            'type': OT.REPLACEMENT.value,
             'context': ('pizzas', 1),
             'old_value': {'name': 'capriciosa'},
             'new_value': {'name': 'parma'},
@@ -134,7 +149,7 @@ SIMPLE_TEST_CASES = [
             ]
         },
         {
-            'type': OT.INSERTION,
+            'type': OT.INSERTION.value,
             'context': ('pizzas', 0, 'rating'),
             'new_value': 5,
         },
@@ -153,7 +168,7 @@ SIMPLE_TEST_CASES = [
             ]
         },
         {
-            'type': OT.REPLACEMENT,
+            'type': OT.REPLACEMENT.value,
             'context': ('pizzas', 0, 'rating'),
             'old_value': 1,
             'new_value': 5,
@@ -168,7 +183,7 @@ SIMPLE_TEST_CASES = [
     (
         {},
         {
-            'type': OT.INSERTION,
+            'type': OT.INSERTION.value,
             'context': ('pizzas',),
             'new_value': [{'name': 'parma'}],
         },
@@ -181,7 +196,7 @@ SIMPLE_TEST_CASES = [
     (
         None,
         {
-            'type': OT.INSERTION,
+            'type': OT.INSERTION.value,
             'context': (),
             'new_value': 'foo',
         },
@@ -190,7 +205,7 @@ SIMPLE_TEST_CASES = [
     (
         'foo',
         {
-            'type': OT.REPLACEMENT,
+            'type': OT.REPLACEMENT.value,
             'context': (),
             'old_value': 'foo',
             'new_value': 'bar',

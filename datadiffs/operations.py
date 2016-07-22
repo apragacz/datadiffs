@@ -1,34 +1,37 @@
+from enum import Enum
+from collections import Callable
+
 from .freezing import freeze_data, unfreeze_data
 from .protocols import DEFAULT_PROTOCOL
 
 __REGISTRY__ = {}
 
 
-class OperationType(object):
+class OperationType(Enum):
     INSERTION = 'insert'
     DELETION = 'delete'
     REPLACEMENT = 'replace'
 
 
-class OperationMetaclass(type):
+class OperationMetaclass(type(Callable)):
 
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
         op_type = attrs.get('TYPE')
         new_cls = super_new(cls, name, bases, attrs)
         if op_type:
-            __REGISTRY__[op_type] = new_cls
+            __REGISTRY__[op_type.value] = new_cls
         return new_cls
 
 
-class Operation(metaclass=OperationMetaclass):
+class Operation(Callable, metaclass=OperationMetaclass):
     TYPE = None
     FIELDS = []
 
     @classmethod
     def from_serializable_data(cls, data):
-        op_type = data['type']
-        op_cls = __REGISTRY__[op_type]
+        op_type_value = data['type']
+        op_cls = __REGISTRY__[op_type_value]
         kwargs = {
             'context': data['context'],
         }
@@ -76,7 +79,7 @@ class Operation(metaclass=OperationMetaclass):
         if not self.TYPE:
             raise NotImplementedError()
         data = {
-            'type': self.type,
+            'type': self.type.value,
             'context': self.context,
         }
         for field in self.FIELDS:
@@ -85,6 +88,14 @@ class Operation(metaclass=OperationMetaclass):
 
     def inverted(self):
         raise NotImplementedError()
+
+    def with_pushed_context_prefix(self, name):
+        kwargs = {
+            'context': (name,) + self.context,
+        }
+        for field in self.FIELDS:
+            kwargs[field] = getattr(self, field)
+        return self.__class__(**kwargs)
 
     def _apply_on(self, value, ctx, protocol):
         ctx_len = len(ctx)
