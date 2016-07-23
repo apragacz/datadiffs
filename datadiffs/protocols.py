@@ -6,25 +6,34 @@ class ValueProtocol(object):
     def is_index(self, name, obj_context=None):
         raise NotImplementedError()
 
+    def is_sequence(self, obj, obj_context=None):
+        raise NotImplementedError()
+
+    def is_mapping(self, obj, obj_context=None):
+        raise NotImplementedError()
+
     def navigate(self, obj, name, obj_context=None):
         raise NotImplementedError()
 
     def insert(self, obj, name, value, obj_context=None):
-        fun = (self.insert_index
-               if self.is_index(name, obj_context=obj_context)
-               else self.insert_key)
+        is_seq_via_name = self.is_index(name, obj_context=obj_context)
+        if is_seq_via_name != self.is_sequence(obj, obj_context=obj_context):
+            raise InvalidValueState('Sequence type mismatch')
+        fun = self.insert_index if is_seq_via_name else self.insert_key
         return fun(obj, name, value, obj_context=obj_context)
 
     def remove(self, obj, name, obj_context=None):
-        fun = (self.remove_index
-               if self.is_index(name, obj_context=obj_context)
-               else self.remove_key)
+        is_seq_via_name = self.is_index(name, obj_context=obj_context)
+        if is_seq_via_name != self.is_sequence(obj, obj_context=obj_context):
+            raise InvalidValueState('Sequence type mismatch')
+        fun = self.remove_index if is_seq_via_name else self.remove_key
         return fun(obj, name, obj_context=obj_context)
 
     def update(self, obj, name, value, obj_context=None):
-        fun = (self.update_index
-               if self.is_index(name, obj_context=obj_context)
-               else self.update_key)
+        is_seq_via_name = self.is_index(name, obj_context=obj_context)
+        if is_seq_via_name != self.is_sequence(obj, obj_context=obj_context):
+            raise InvalidValueState('Sequence type mismatch')
+        fun = self.update_index if is_seq_via_name else self.update_key
         return fun(obj, name, value, obj_context=obj_context)
 
 
@@ -33,8 +42,22 @@ class ImmutableDictListProtocol(ValueProtocol):
     def is_index(self, name, obj_context=None):
         return isinstance(name, int)
 
+    def is_sequence(self, obj, obj_context=None):
+        return isinstance(obj, (tuple, list))
+
+    def is_mapping(self, obj, obj_context=None):
+        return isinstance(obj, dict)
+
     def navigate(self, obj, name, obj_context=None):
         return obj[name]
+
+    def get_values_for_keys(self, obj):
+        assert self.is_mapping(obj)
+        return obj
+
+    def get_elements(self, obj):
+        assert self.is_sequence(obj)
+        return obj
 
     def insert_key(self, obj, key, value, obj_context=None):
         if key in obj:
