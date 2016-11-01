@@ -1,4 +1,5 @@
-from hypothesis import given, strategies as st
+from hypothesis import strategies as st
+from hypothesis import given
 
 from datadiffs import Diff, find_diff
 
@@ -24,6 +25,12 @@ def test_cases():
 
 @given(st.lists(st.integers()), st.lists(st.integers()))
 def test_random_lists_of_integers(l1, l2):
+    _test_case(l1, l2)
+
+
+@given(st.lists(st.dictionaries(st.text(), st.text())),
+       st.lists(st.dictionaries(st.text(), st.text())))
+def test_random_lists_of_dicts(l1, l2):
     _test_case(l1, l2)
 
 

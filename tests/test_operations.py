@@ -1,4 +1,5 @@
-from datadiffs import Operation, OperationType as OT
+from datadiffs import OperationType as OT
+from datadiffs import Operation
 
 
 def _test_simple_case(case):

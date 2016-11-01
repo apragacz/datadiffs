@@ -1,5 +1,5 @@
-from enum import Enum
 from collections import Callable
+from enum import Enum
 
 from .freezing import freeze_data, unfreeze_data
 from .protocols import DEFAULT_PROTOCOL

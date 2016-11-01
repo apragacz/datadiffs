@@ -1,6 +1,5 @@
 from .diffs import Diff
-from .operations import DEFAULT_PROTOCOL, Replacement, Insertion, Deletion
-
+from .operations import DEFAULT_PROTOCOL, Deletion, Insertion, Replacement
 
 SEQUENCE_TYPES = (tuple, list)
 
